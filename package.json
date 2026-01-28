@@ -1,0 +1,40 @@
+{
+  "name": "fluid-light-pattern",
+  "version": "1.0.0",
+  "description": "Interactive fluid light pattern effect with WebGL and Canvas 2D",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "vite demo/index.html --open",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react",
+    "webgl",
+    "canvas",
+    "animation",
+    "effect",
+    "interactive",
+    "fluid",
+    "light",
+    "background"
+  ],
+  "author": "Mi Inge",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
+  }
+}

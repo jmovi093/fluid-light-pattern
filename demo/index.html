@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fluid Light Pattern - Interactive Demo</title>
+    <style>
+      * { margin: 0; padding: 0; }
+      body { overflow: hidden; background: rgb(0, 0, 0); }
+
+      #fluid-canvas {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 1; visibility: hidden;
+      }
+
+      #mask-canvas {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 2; pointer-events: none;
+      }
+
+      #debug {
+        position: fixed; top: 10px; left: 10px;
+        background: rgba(0, 0, 0, 0.7); color: white;
+        padding: 10px; font-family: monospace; font-size: 12px; z-index: 1000;
+      }
+
+      #controls {
+        position: fixed; top: 10px; right: 10px;
+        background: rgba(0, 0, 0, 0.85); color: white; padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 13px; z-index: 1000; border-radius: 8px; width: 280px;
+        max-height: 90vh; overflow-y: auto;
+      }
+
+      #controls h3 {
+        margin: 0 0 15px 0; font-size: 16px;
+        border-bottom: 2px solid #444cf7; padding-bottom: 8px;
+      }
+
+      .control-group { margin-bottom: 20px; }
+
+      .control-group label {
+        display: block; margin-bottom: 5px;
+        font-weight: 600; color: #444cf7;
+      }
+
+      .control-group input[type='range'] {
+        width: 100%; margin-bottom: 5px;
+      }
+
+      .control-value {
+        display: inline-block; background: rgba(68, 76, 247, 0.2);
+        padding: 2px 8px; border-radius: 3px;
+        font-family: monospace; font-size: 12px;
+      }
+
+      .control-description {
+        font-size: 11px; color: #aaa;
+        margin-top: 5px; line-height: 1.4;
+      }
+
+      h4 {
+        margin: 20px 0 10px 0; color: #9d9df7;
+        font-size: 14px; border-bottom: 1px solid #444cf7;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="fluid-canvas"></canvas>
+    <canvas id="mask-canvas"></canvas>
+
+    <div id="debug">Light spots: 0<br />FPS: 0</div>
+
+    <div id="controls">
+      <h3>🎨 Fluid Light Controls</h3>
+
+      <h4>🔵 Light Blob Settings</h4>
+
+      <div class="control-group">
+        <label>Base Radius: <span class="control-value" id="val-radius">190</span>px</label>
+        <input type="range" id="ctrl-radius" min="50" max="300" value="190" step="10" />
+      </div>
+
+      <div class="control-group">
+        <label>Blur Amount: <span class="control-value" id="val-blur">30</span>px</label>
+        <input type="range" id="ctrl-blur" min="10" max="80" value="30" step="5" />
+      </div>
+
+      <div class="control-group">
+        <label>Current Opacity: <span class="control-value" id="val-current-opacity">0.9</span></label>
+        <input type="range" id="ctrl-current-opacity" min="0.3" max="1" value="0.9" step="0.05" />
+      </div>
+
+      <div class="control-group">
+        <label>Trail Brightness: <span class="control-value" id="val-trail-multiplier">0.4</span>x</label>
+        <input type="range" id="ctrl-trail-multiplier" min="0.1" max="1" value="0.4" step="0.05" />
+      </div>
+
+      <div class="control-group">
+        <label>Fade Speed: <span class="control-value" id="val-fade">0.007</span></label>
+        <input type="range" id="ctrl-fade" min="0" max="0.05" value="0.007" step="0.001" />
+      </div>
+
+      <div class="control-group">
+        <label>Trail Taper: <span class="control-value" id="val-trail-taper">2.0</span>x</label>
+        <input type="range" id="ctrl-trail-taper" min="0.2" max="10" value="2.0" step="0.1" />
+        <div class="control-description">Controla qué tan puntiaguda es la cola. Mayor valor = cola más puntiaguda.</div>
+      </div>
+
+      <h4>✨ Age Fade Settings</h4>
+
+      <div class="control-group">
+        <label>Age Fade Type</label>
+        <select id="ctrl-age-fade-type" style="width: 100%; padding: 8px; background: rgba(68, 76, 247, 0.2); color: white; border: 1px solid #444cf7; border-radius: 4px; font-family: monospace; cursor: pointer;">
+          <option value="none">None (Disabled)</option>
+          <option value="linear">Linear</option>
+          <option value="exponential" selected>Exponential</option>
+          <option value="logarithmic">Logarithmic</option>
+        </select>
+        <div class="control-description">Linear = degradado uniforme<br />Exponential = brillante al inicio, oscurece rápido al final<br />Logarithmic = oscurece rápido al inicio, lento al final</div>
+      </div>
+
+      <div class="control-group">
+        <label>Age Fade Strength: <span class="control-value" id="val-age-fade-strength">0.7</span></label>
+        <input type="range" id="ctrl-age-fade-strength" min="0" max="1" value="0.7" step="0.05" />
+        <div class="control-description">Intensidad del efecto de edad. 0 = desactivado, 1 = máximo efecto.</div>
+      </div>
+
+      <h4>⚙️ Main Blob Animation</h4>
+
+      <div class="control-group">
+        <label>Close Delay: <span class="control-value" id="val-close-delay">300</span>ms</label>
+        <input type="range" id="ctrl-close-delay" min="0" max="2000" value="300" step="50" />
+        <div class="control-description">Tiempo de espera antes de cerrar el blob después de dejar de mover el mouse. Evita parpadeos.</div>
+      </div>
+
+      <div class="control-group">
+        <label>Open/Close Speed: <span class="control-value" id="val-main-close-speed">0.01</span></label>
+        <input type="range" id="ctrl-main-close-speed" min="0.005" max="0.1" value="0.01" step="0.005" />
+        <div class="control-description">Velocidad de apertura y cierre del blob principal.</div>
+      </div>
+
+      <h4>🌊 Fluid Pattern Settings</h4>
+
+      <div class="control-group">
+        <label>Background Color</label>
+        <input type="color" id="ctrl-bg-color" value="#000000" style="width: 100%; height: 35px; cursor: pointer" />
+      </div>
+
+      <div class="control-group">
+        <label>Pattern Color</label>
+        <input type="color" id="ctrl-pattern-color" value="#0d00ff" style="width: 100%; height: 35px; cursor: pointer" />
+      </div>
+
+      <div class="control-group">
+        <label>Pattern Opacity: <span class="control-value" id="val-pattern-opacity">1</span></label>
+        <input type="range" id="ctrl-pattern-opacity" min="0" max="1" value="1" step="0.05" />
+      </div>
+
+      <div class="control-group">
+        <label>Pattern 1 Scale: <span class="control-value" id="val-p1-scale">1.5</span></label>
+        <input type="range" id="ctrl-p1-scale" min="0.5" max="10" value="1.5" step="0.5" />
+      </div>
+
+      <div class="control-group">
+        <label>Pattern 2 Scale: <span class="control-value" id="val-p2-scale">0.5</span></label>
+        <input type="range" id="ctrl-p2-scale" min="0.5" max="10" value="0.5" step="0.5" />
+      </div>
+
+      <div class="control-group">
+        <label>Pattern 3 Scale: <span class="control-value" id="val-p3-scale">0.3</span></label>
+        <input type="range" id="ctrl-p3-scale" min="0.1" max="10" value="0.3" step="0.1" />
+      </div>
+
+      <div class="control-group">
+        <label>Pattern 4 Scale: <span class="control-value" id="val-p4-scale">0.3</span></label>
+        <input type="range" id="ctrl-p4-scale" min="0.1" max="10" value="0.3" step="0.1" />
+      </div>
+
+      <div class="control-group">
+        <label>Animation Speed: <span class="control-value" id="val-fluid-speed">1.0</span>x</label>
+        <input type="range" id="ctrl-fluid-speed" min="0" max="3" value="1.0" step="0.1" />
+      </div>
+    </div>
+
+    <script src="./demo.js"></script>
+  </body>
+</html>
