@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "vite demo/index.html --open",
+    "dev": "vite --open /demo/index.html",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

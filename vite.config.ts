@@ -1,20 +1,9 @@
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "declaration": true,
-    "declarationMap": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  root: './demo',
+  server: {
+    port: 3000,
+    open: true,
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "demo"]
-}
+});
