@@ -10,9 +10,9 @@
     "demo",
     "examples",
     "README.md"
-  ] ,
-  "scripts": {
-    "build": "tsc",
+  ],
+   "scripts": {
+    "build": "tsc && copyfiles -u 1 src/**/*.css dist/",
     "dev": "vite --open /demo/index.html",
     "prepublishOnly": "npm run build"
   },
@@ -40,5 +40,3 @@
     "react-dom": "^18.2.0",
     "typescript": "^5.0.0",
     "vite": "^5.0.0"
-  }
-}
