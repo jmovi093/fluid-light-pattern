@@ -5,8 +5,12 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
-  ],
+    "dist",
+    "src",
+    "demo",
+    "examples",
+    "README.md"
+  ] ,
   "scripts": {
     "build": "tsc",
     "dev": "vite --open /demo/index.html",
