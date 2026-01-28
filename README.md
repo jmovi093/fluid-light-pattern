@@ -1,11 +1,8 @@
-# 🌊 Fluid Light Pattern
+# Fluid Light Pattern
 
 An interactive fluid light pattern effect combining WebGL shaders and Canvas 2D for creating dynamic, mouse-responsive visual backgrounds.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-
-## ✨ Features
+## Features
 
 - **WebGL Fluid Animations**: Four distinct geometric patterns animated with linear and radial waves
 - **Interactive Light Blobs**: Mouse-responsive light spots with trailing effects
@@ -15,11 +12,11 @@ An interactive fluid light pattern effect combining WebGL shaders and Canvas 2D 
 - **TypeScript Support**: Fully typed React component
 - **Zero Dependencies**: No external libraries required (except React for component version)
 
-## 🎮 Interactive Demo
+## Interactive Demo
 
 Check out the [live demo](demo/index.html) with full interactive controls to customize all parameters in real-time.
 
-## 📦 Installation
+## Installation
 
 ### From GitHub (Recommended for personal use)
 
@@ -44,12 +41,12 @@ pnpm install github:yourusername/fluid-light-pattern#v1.0.0
 pnpm install github:yourusername/fluid-light-pattern#dev
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Basic Usage
 
 ```tsx
-import { FluidLightPattern } from 'fluid-light-pattern';
+import { FluidLightPattern } from "fluid-light-pattern";
 
 function App() {
   return (
@@ -64,15 +61,13 @@ function App() {
 ### As Section Background
 
 ```tsx
-import { FluidLightPattern } from 'fluid-light-pattern';
+import { FluidLightPattern } from "fluid-light-pattern";
 
 function HeroSection() {
   return (
-    <section style={{ position: 'relative', height: '100vh' }}>
-      <FluidLightPattern 
-        style={{ position: 'absolute', inset: 0 }}
-      />
-      <div style={{ position: 'relative', zIndex: 10 }}>
+    <section style={{ position: "relative", height: "100vh" }}>
+      <FluidLightPattern style={{ position: "absolute", inset: 0 }} />
+      <div style={{ position: "relative", zIndex: 10 }}>
         <h1>Hero Title</h1>
       </div>
     </section>
@@ -83,7 +78,7 @@ function HeroSection() {
 ### Custom Configuration
 
 ```tsx
-import { FluidLightPattern } from 'fluid-light-pattern';
+import { FluidLightPattern } from "fluid-light-pattern";
 
 function CustomBackground() {
   return (
@@ -91,27 +86,27 @@ function CustomBackground() {
       fullscreen
       config={{
         baseRadius: 150,
-        patternColor: '#ff00ff',
+        patternColor: "#ff00ff",
         animationSpeed: 0.5,
-        ageFadeType: 'exponential',
+        ageFadeType: "exponential",
       }}
     />
   );
 }
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### FluidLightPatternProps
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `fullscreen` | `boolean` | `false` | Render as fullscreen fixed overlay |
-| `className` | `string` | - | Custom CSS class |
-| `style` | `CSSProperties` | - | Custom inline styles |
-| `config` | `Partial<FluidLightConfig>` | - | Configuration overrides |
-| `showDebug` | `boolean` | `false` | Show FPS and spot count |
-| `zIndex` | `{ fluid?: number, mask?: number }` | `{ fluid: 1, mask: 2 }` | Z-index values |
+| Prop         | Type                                | Default                 | Description                        |
+| ------------ | ----------------------------------- | ----------------------- | ---------------------------------- |
+| `fullscreen` | `boolean`                           | `false`                 | Render as fullscreen fixed overlay |
+| `className`  | `string`                            | -                       | Custom CSS class                   |
+| `style`      | `CSSProperties`                     | -                       | Custom inline styles               |
+| `config`     | `Partial<FluidLightConfig>`         | -                       | Configuration overrides            |
+| `showDebug`  | `boolean`                           | `false`                 | Show FPS and spot count            |
+| `zIndex`     | `{ fluid?: number, mask?: number }` | `{ fluid: 1, mask: 2 }` | Z-index values                     |
 
 ### FluidLightConfig
 
@@ -162,7 +157,7 @@ function CustomBackground() {
 }
 ```
 
-## 🎨 Usage Examples
+## Usage Examples
 
 ### Subtle Hero Background
 
@@ -174,7 +169,7 @@ function CustomBackground() {
     currentOpacity: 0.3,
     trailMultiplier: 0.2,
     fadeSpeed: 0.01,
-    patternColor: '#1a1a2e',
+    patternColor: "#1a1a2e",
     animationSpeed: 0.5,
   }}
 />
@@ -190,8 +185,8 @@ function CustomBackground() {
     currentOpacity: 1,
     trailMultiplier: 0.6,
     fadeSpeed: 0.005,
-    ageFadeType: 'linear',
-    patternColor: '#ff006e',
+    ageFadeType: "linear",
+    patternColor: "#ff006e",
     animationSpeed: 1.5,
   }}
 />
@@ -200,27 +195,27 @@ function CustomBackground() {
 ### Section Background with Custom Colors
 
 ```tsx
-<div style={{ position: 'relative', minHeight: '500px' }}>
+<div style={{ position: "relative", minHeight: "500px" }}>
   <FluidLightPattern
     config={{
-      backgroundColor: '#0a0e27',
-      patternColor: '#00d9ff',
+      backgroundColor: "#0a0e27",
+      patternColor: "#00d9ff",
       baseRadius: 180,
     }}
   />
-  <div style={{ position: 'relative', zIndex: 10, padding: '2rem' }}>
+  <div style={{ position: "relative", zIndex: 10, padding: "2rem" }}>
     <h2>Section Content</h2>
   </div>
 </div>
 ```
 
-## 🛠️ Development
+## Development
 
 ### Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/fluid-light-pattern.git
+git clone https://github.com/jmovi093/fluid-light-pattern.git
 cd fluid-light-pattern
 
 # Install dependencies
@@ -254,11 +249,11 @@ fluid-light-pattern/
 └── README.md
 ```
 
-## 🎯 How It Works
+## How It Works
 
 The effect combines two rendering contexts:
 
-1. **WebGL Layer (Background)**: 
+1. **WebGL Layer (Background)**:
    - Renders geometric patterns using fragment shaders
    - Animates using linear and radial waves
    - Four distinct patterns blend based on wave values
@@ -270,15 +265,7 @@ The effect combines two rendering contexts:
 
 The result is a fluid pattern that's only visible where you move your mouse, creating an interactive "paint" effect.
 
-## 📄 License
-
-MIT © Mi Inge
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to submit issues or pull requests.
-
-## 🌟 Acknowledgments
+## Acknowledgments
 
 - Inspired by fluid dynamics and interactive visual effects
 - Built with modern WebGL and Canvas 2D APIs
