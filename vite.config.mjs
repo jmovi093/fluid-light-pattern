@@ -22,7 +22,6 @@ export default defineConfig({
           'react-dom': 'ReactDOM',
           'react/jsx-runtime': 'jsxRuntime',
         },
-        // Asegurar que CSS se extraiga
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') return 'style.css';
           return assetInfo.name;
@@ -32,7 +31,9 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     sourcemap: true,
+    cssCodeSplit: false,
+  },
+  css: {
+    modules: false,
   },
 });
-
-//

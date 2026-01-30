@@ -1,1 +1,1 @@
-{"version":3,"file":"FluidLightPattern.d.ts","sourceRoot":"","sources":["../src/FluidLightPattern.tsx"],"names":[],"mappings":"AAAA,OAAO,KAA0B,MAAM,OAAO,CAAC;AAI/C,OAAO,KAAK,EAAE,sBAAsB,EAAoB,MAAM,SAAS,CAAC;AAGxE,eAAO,MAAM,iBAAiB,EAAE,KAAK,CAAC,EAAE,CAAC,sBAAsB,CAwD9D,CAAC"}
+{"version":3,"file":"FluidLightPattern.d.ts","sourceRoot":"","sources":["../src/FluidLightPattern.tsx"],"names":[],"mappings":"AAAA,OAAO,KAA0B,MAAM,OAAO,CAAC;AAI/C,OAAO,KAAK,EAAE,sBAAsB,EAAoB,MAAM,SAAS,CAAC;AACxE,OAAO,yBAAyB,CAAC;AAUjC,eAAO,MAAM,iBAAiB,EAAE,KAAK,CAAC,EAAE,CAAC,sBAAsB,CAwD9D,CAAC"}

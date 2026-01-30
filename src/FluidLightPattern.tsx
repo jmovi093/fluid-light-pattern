@@ -3,7 +3,15 @@ import { useFluidAnimation } from './useFluidAnimation';
 import { useLightBlobs } from './useLightBlobs';
 import { DEFAULT_CONFIG } from './config';
 import type { FluidLightPatternProps, FluidLightConfig } from './types';
-import styles from './FluidLightPattern.module.css';
+import './FluidLightPattern.css';
+
+const styles = {
+  container: 'fluidLightPattern__container',
+  containerFullscreen: 'fluidLightPattern__containerFullscreen',
+  fluidCanvas: 'fluidLightPattern__fluidCanvas',
+  maskCanvas: 'fluidLightPattern__maskCanvas',
+  debug: 'fluidLightPattern__debug',
+};
 
 export const FluidLightPattern: React.FC<FluidLightPatternProps> = ({
   fullscreen = false,

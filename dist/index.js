@@ -1,9 +1,9 @@
 import { jsxs as I, jsx as O } from "react/jsx-runtime";
-import { useRef as f, useEffect as W, useState as N, useMemo as B } from "react";
-const Y = `
+import { useRef as d, useEffect as B, useState as N, useMemo as Y } from "react";
+const z = `
   attribute vec2 position;
   void main() { gl_Position = vec4(position, 0.0, 1.0); }
-`, j = `
+`, X = `
   precision mediump float;
   uniform vec2 iResolution;
   uniform float iTime;
@@ -112,45 +112,45 @@ const Y = `
     gl_FragColor = vec4(mix(bg_color, pc, pm * op), 1.0);
   }
 `;
-function k(u) {
-  const o = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(u);
+function k(f) {
+  const o = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(f);
   return o ? [
     parseInt(o[1], 16) / 255,
     parseInt(o[2], 16) / 255,
     parseInt(o[3], 16) / 255
   ] : [0, 0, 0];
 }
-function z(u, o) {
-  const r = f(null), d = f(null), y = f(null), b = f(Date.now()), l = f(null);
-  return W(() => {
-    const i = u.current;
-    if (!i) return;
-    const e = i.getContext("webgl");
+function $(f, o) {
+  const r = d(null), m = d(null), y = d(null), b = d(Date.now()), l = d(null);
+  return B(() => {
+    const c = f.current;
+    if (!c) return;
+    const e = c.getContext("webgl");
     if (!e) {
       console.error("WebGL not supported");
       return;
     }
     r.current = e;
     const g = () => {
-      i.width = window.innerWidth, i.height = window.innerHeight, e.viewport(0, 0, i.width, i.height);
+      c.width = window.innerWidth, c.height = window.innerHeight, e.viewport(0, 0, c.width, c.height);
     };
     g();
-    const R = (s, F) => {
-      const m = e.createShader(F);
-      return m ? (e.shaderSource(m, s), e.compileShader(m), m) : null;
+    const x = (s, F) => {
+      const v = e.createShader(F);
+      return v ? (e.shaderSource(v, s), e.compileShader(v), v) : null;
     }, a = e.createProgram();
     if (!a) return;
-    const v = R(Y, e.VERTEX_SHADER), C = R(j, e.FRAGMENT_SHADER);
-    if (!v || !C) return;
-    e.attachShader(a, v), e.attachShader(a, C), e.linkProgram(a), e.useProgram(a), d.current = a;
+    const u = x(z, e.VERTEX_SHADER), C = x(X, e.FRAGMENT_SHADER);
+    if (!u || !C) return;
+    e.attachShader(a, u), e.attachShader(a, C), e.linkProgram(a), e.useProgram(a), m.current = a;
     const p = e.createBuffer();
     e.bindBuffer(e.ARRAY_BUFFER, p), e.bufferData(
       e.ARRAY_BUFFER,
       new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
       e.STATIC_DRAW
     );
-    const w = e.getAttribLocation(a, "position");
-    e.enableVertexAttribArray(w), e.vertexAttribPointer(w, 2, e.FLOAT, !1, 0, 0), y.current = {
+    const S = e.getAttribLocation(a, "position");
+    e.enableVertexAttribArray(S), e.vertexAttribPointer(S, 2, e.FLOAT, !1, 0, 0), y.current = {
       res: e.getUniformLocation(a, "iResolution"),
       time: e.getUniformLocation(a, "iTime"),
       bg: e.getUniformLocation(a, "bg_color"),
@@ -167,85 +167,89 @@ function z(u, o) {
       p4o: e.getUniformLocation(a, "p4_opacity"),
       p4s: e.getUniformLocation(a, "p4_scale")
     };
-    const L = () => {
+    const w = () => {
       if (!e || !y.current) return;
-      const s = y.current, F = k(o.backgroundColor), m = k(o.patternColor);
-      e.uniform2f(s.res, i.width, i.height), e.uniform1f(
+      const s = y.current, F = k(o.backgroundColor), v = k(o.patternColor);
+      e.uniform2f(s.res, c.width, c.height), e.uniform1f(
         s.time,
         (Date.now() - b.current) / 1e3 * o.animationSpeed
-      ), e.uniform3fv(s.bg, F), e.uniform3fv(s.p1c, m), e.uniform1f(s.p1o, o.patternOpacity), e.uniform1f(s.p1s, o.pattern1Scale), e.uniform3fv(s.p2c, m), e.uniform1f(s.p2o, o.patternOpacity), e.uniform1f(s.p2s, o.pattern2Scale), e.uniform3fv(s.p3c, m), e.uniform1f(s.p3o, o.patternOpacity), e.uniform1f(s.p3s, o.pattern3Scale), e.uniform3fv(s.p4c, m), e.uniform1f(s.p4o, o.patternOpacity), e.uniform1f(s.p4s, o.pattern4Scale), e.drawArrays(e.TRIANGLE_STRIP, 0, 4), l.current = requestAnimationFrame(L);
+      ), e.uniform3fv(s.bg, F), e.uniform3fv(s.p1c, v), e.uniform1f(s.p1o, o.patternOpacity), e.uniform1f(s.p1s, o.pattern1Scale), e.uniform3fv(s.p2c, v), e.uniform1f(s.p2o, o.patternOpacity), e.uniform1f(s.p2s, o.pattern2Scale), e.uniform3fv(s.p3c, v), e.uniform1f(s.p3o, o.patternOpacity), e.uniform1f(s.p3s, o.pattern3Scale), e.uniform3fv(s.p4c, v), e.uniform1f(s.p4o, o.patternOpacity), e.uniform1f(s.p4s, o.pattern4Scale), e.drawArrays(e.TRIANGLE_STRIP, 0, 4), l.current = requestAnimationFrame(w);
     };
-    return L(), window.addEventListener("resize", g), () => {
+    return w(), window.addEventListener("resize", g), () => {
       window.removeEventListener("resize", g), l.current && cancelAnimationFrame(l.current);
     };
-  }, [u, o]), r;
+  }, [f, o]), r;
 }
-function X(u, o, r) {
+function G(f, o, r) {
   if (o === "none" || r === 0)
     return 1;
-  let d = 1;
+  let m = 1;
   switch (o) {
     case "linear":
-      d = 1 - u;
+      m = 1 - f;
       break;
     case "exponential":
-      d = Math.pow(1 - u, 2);
+      m = Math.pow(1 - f, 2);
       break;
     case "logarithmic":
-      d = 1 - Math.pow(u, 0.5);
+      m = 1 - Math.pow(f, 0.5);
       break;
   }
-  return 1 - (1 - d) * r;
+  return 1 - (1 - m) * r;
 }
-function $(u, o, r, d) {
-  const [y, b] = N({ spots: 0, fps: 0 }), l = f([]), i = f({ x: 0, y: 0, prevX: 0, prevY: 0 }), e = f({ x: 0, y: 0 }), g = f({
+function H(f, o, r, m) {
+  const [y, b] = N({ spots: 0, fps: 0 }), l = d([]), c = d({ x: 0, y: 0, prevX: 0, prevY: 0 }), e = d({ x: 0, y: 0 }), g = d({
     currentRadius: 0,
     currentOpacity: 0,
     lastMoveTime: Date.now()
-  }), R = f({ frameCount: 0, lastFpsTime: Date.now(), fps: 0 }), a = f(null);
-  return W(() => {
-    const v = u.current, C = o.current;
-    if (!v || !C) return;
-    const p = v.getContext("2d");
+  }), x = d({ frameCount: 0, lastFpsTime: Date.now(), fps: 0 }), a = d(null);
+  return B(() => {
+    const u = f.current, C = o.current;
+    if (!u || !C) return;
+    const p = u.getContext("2d");
     if (!p) return;
-    const w = () => {
-      v.width = window.innerWidth, v.height = window.innerHeight;
+    const S = () => {
+      if (!u) return;
+      const t = u.getBoundingClientRect();
+      u.width = t.width, u.height = t.height;
     };
-    w();
-    const L = (t) => {
-      i.current.x = t.clientX, i.current.y = t.clientY;
-    }, s = (t, c, n, S, _) => {
+    S();
+    const w = (t) => {
+      if (!u) return;
+      const i = u.getBoundingClientRect();
+      c.current.x = t.clientX - i.left, c.current.y = t.clientY - i.top;
+    }, s = (t, i, n, L, h) => {
       l.current.push({
         x: t,
-        y: c,
+        y: i,
         opacity: n,
         baseOpacity: n,
         radius: r.baseRadius,
-        velX: S,
-        velY: _,
+        velX: L,
+        velY: h,
         age: 0,
         createdAt: Date.now()
       }), l.current.length > 150 && l.current.shift();
     }, F = () => {
       for (let t = l.current.length - 1; t >= 0; t--) {
-        const c = l.current[t];
-        c.age++;
-        const n = Math.min(c.age * r.fadeSpeed, 1);
-        c.opacity -= r.fadeSpeed, c.radius -= r.fadeSpeed * 100 * r.trailTaper;
-        const S = X(
+        const i = l.current[t];
+        i.age++;
+        const n = Math.min(i.age * r.fadeSpeed, 1);
+        i.opacity -= r.fadeSpeed, i.radius -= r.fadeSpeed * 100 * r.trailTaper;
+        const L = G(
           n,
           r.ageFadeType,
           r.ageFadeStrength
-        ), _ = c.opacity * S;
-        if (_ <= 0.01 || c.radius <= 10) {
+        ), h = i.opacity * L;
+        if (h <= 0.01 || i.radius <= 10) {
           l.current.splice(t, 1);
           continue;
         }
-        c.renderOpacity = _;
+        i.renderOpacity = h;
       }
-    }, m = (t) => {
+    }, v = (t) => {
       p.save();
-      const c = t.renderOpacity !== void 0 ? t.renderOpacity : t.opacity, n = p.createRadialGradient(
+      const i = t.renderOpacity !== void 0 ? t.renderOpacity : t.opacity, n = p.createRadialGradient(
         t.x,
         t.y,
         0,
@@ -253,7 +257,7 @@ function $(u, o, r, d) {
         t.y,
         t.radius + r.blurAmount
       );
-      n.addColorStop(0, `rgba(255, 255, 255, ${c})`), n.addColorStop(0.6, `rgba(255, 255, 255, ${c * 0.5})`), n.addColorStop(1, "rgba(255, 255, 255, 0)"), p.beginPath(), p.arc(
+      n.addColorStop(0, `rgba(255, 255, 255, ${i})`), n.addColorStop(0.6, `rgba(255, 255, 255, ${i * 0.5})`), n.addColorStop(1, "rgba(255, 255, 255, 0)"), p.beginPath(), p.arc(
         t.x,
         t.y,
         t.radius + r.blurAmount,
@@ -261,50 +265,50 @@ function $(u, o, r, d) {
         Math.PI * 2
       ), p.fillStyle = n, p.filter = `blur(${r.blurAmount}px)`, p.fill(), p.restore();
     }, U = () => {
-      p.clearRect(0, 0, v.width, v.height);
-      const t = i.current, c = e.current, n = g.current, S = t.x - t.prevX, _ = t.y - t.prevY, E = S !== 0 || _ !== 0;
-      c.x = c.x * 0.8 + S * 0.2, c.y = c.y * 0.8 + _ * 0.2;
-      const M = Date.now() - n.lastMoveTime <= r.closeDelay;
+      p.clearRect(0, 0, u.width, u.height);
+      const t = c.current, i = e.current, n = g.current, L = t.x - t.prevX, h = t.y - t.prevY, M = L !== 0 || h !== 0;
+      i.x = i.x * 0.8 + L * 0.2, i.y = i.y * 0.8 + h * 0.2;
+      const P = Date.now() - n.lastMoveTime <= r.closeDelay;
       let T = !1;
-      if (E ? (n.lastMoveTime = Date.now(), T = !0) : T = M, T) {
-        const x = r.mainCloseSpeed * 100;
-        n.currentRadius += x, n.currentRadius > r.baseRadius && (n.currentRadius = r.baseRadius);
-        const P = n.currentRadius / r.baseRadius;
-        n.currentOpacity = r.currentOpacity * P;
+      if (M ? (n.lastMoveTime = Date.now(), T = !0) : T = P, T) {
+        const R = r.mainCloseSpeed * 100;
+        n.currentRadius += R, n.currentRadius > r.baseRadius && (n.currentRadius = r.baseRadius);
+        const W = n.currentRadius / r.baseRadius;
+        n.currentOpacity = r.currentOpacity * W;
       } else {
         n.currentRadius -= r.mainCloseSpeed * 100 * r.mainCloseTaper, n.currentRadius < 0 && (n.currentRadius = 0);
-        const x = n.currentRadius / r.baseRadius;
-        n.currentOpacity = r.currentOpacity * x;
+        const R = n.currentRadius / r.baseRadius;
+        n.currentOpacity = r.currentOpacity * R;
       }
-      if (T && (E || M)) {
-        const x = r.currentOpacity * r.trailMultiplier;
-        s(t.x, t.y, x, c.x, c.y);
+      if (T && (M || P)) {
+        const R = r.currentOpacity * r.trailMultiplier;
+        s(t.x, t.y, R, i.x, i.y);
       }
-      F(), p.globalCompositeOperation = "source-over", l.current.forEach((x) => {
-        m(x);
-      }), n.currentRadius > 0 && m({
+      F(), p.globalCompositeOperation = "source-over", l.current.forEach((R) => {
+        v(R);
+      }), n.currentRadius > 0 && v({
         x: t.x,
         y: t.y,
         opacity: n.currentOpacity,
         baseOpacity: n.currentOpacity,
         radius: n.currentRadius,
-        velX: c.x,
-        velY: c.y
+        velX: i.x,
+        velY: i.y
       }), p.globalCompositeOperation = "source-in", p.drawImage(C, 0, 0), p.globalCompositeOperation = "source-over";
-      const h = R.current;
-      h.frameCount++;
+      const _ = x.current;
+      _.frameCount++;
       const D = Date.now();
-      D - h.lastFpsTime >= 1e3 && (h.fps = h.frameCount, h.frameCount = 0, h.lastFpsTime = D, d && b({
+      D - _.lastFpsTime >= 1e3 && (_.fps = _.frameCount, _.frameCount = 0, _.lastFpsTime = D, m && b({
         spots: l.current.length + 1,
-        fps: h.fps
+        fps: _.fps
       })), t.prevX = t.x, t.prevY = t.y, a.current = requestAnimationFrame(U);
+    }, E = u.getBoundingClientRect();
+    return c.current.x = E.width / 2, c.current.y = E.height / 2, c.current.prevX = c.current.x, c.current.prevY = c.current.y, U(), document.addEventListener("mousemove", w), window.addEventListener("resize", S), () => {
+      document.removeEventListener("mousemove", w), window.removeEventListener("resize", S), a.current && cancelAnimationFrame(a.current);
     };
-    return i.current.x = window.innerWidth / 2, i.current.y = window.innerHeight / 2, i.current.prevX = i.current.x, i.current.prevY = i.current.y, U(), document.addEventListener("mousemove", L), window.addEventListener("resize", w), () => {
-      document.removeEventListener("mousemove", L), window.removeEventListener("resize", w), a.current && cancelAnimationFrame(a.current);
-    };
-  }, [u, o, r, d]), y;
+  }, [f, o, r, m]), y;
 }
-const G = {
+const j = {
   // Light blob settings (exactly as in your prototype)
   baseRadius: 190,
   blurAmount: 30,
@@ -330,35 +334,35 @@ const G = {
   pattern4Scale: 0.3,
   // Animation
   animationSpeed: 1
-}, H = "_container_wjdnx_1", q = "_containerFullscreen_wjdnx_13", V = "_fluidCanvas_wjdnx_31", J = "_maskCanvas_wjdnx_49", K = "_debug_wjdnx_67", A = {
-  container: H,
-  containerFullscreen: q,
-  fluidCanvas: V,
-  maskCanvas: J,
-  debug: K
-}, Q = ({
-  fullscreen: u = !1,
+}, A = {
+  container: "fluidLightPattern__container",
+  containerFullscreen: "fluidLightPattern__containerFullscreen",
+  fluidCanvas: "fluidLightPattern__fluidCanvas",
+  maskCanvas: "fluidLightPattern__maskCanvas",
+  debug: "fluidLightPattern__debug"
+}, q = ({
+  fullscreen: f = !1,
   className: o,
   style: r,
-  config: d,
+  config: m,
   showDebug: y = !1,
   zIndex: b = { fluid: 1, mask: 2 }
 }) => {
-  const l = f(null), i = f(null), e = B(
+  const l = d(null), c = d(null), e = Y(
     () => ({
-      ...G,
-      ...d
+      ...j,
+      ...m
     }),
-    [d]
+    [m]
   );
-  z(l, e);
-  const g = $(
-    i,
+  $(l, e);
+  const g = H(
+    c,
     l,
     e,
     y
-  ), R = `${A.container} ${u ? A.containerFullscreen : ""} ${o || ""}`.trim();
-  return /* @__PURE__ */ I("div", { className: R, style: r, children: [
+  ), x = `${A.container} ${f ? A.containerFullscreen : ""} ${o || ""}`.trim();
+  return /* @__PURE__ */ I("div", { className: x, style: r, children: [
     /* @__PURE__ */ O(
       "canvas",
       {
@@ -370,7 +374,7 @@ const G = {
     /* @__PURE__ */ O(
       "canvas",
       {
-        ref: i,
+        ref: c,
         className: A.maskCanvas,
         style: { zIndex: b.mask }
       }
@@ -384,9 +388,9 @@ const G = {
     ] })
   ] });
 };
-Q.displayName = "FluidLightPattern";
+q.displayName = "FluidLightPattern";
 export {
-  G as DEFAULT_CONFIG,
-  Q as FluidLightPattern
+  j as DEFAULT_CONFIG,
+  q as FluidLightPattern
 };
 //# sourceMappingURL=index.js.map
