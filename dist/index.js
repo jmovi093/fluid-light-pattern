@@ -393,4 +393,3 @@ export {
   j as DEFAULT_CONFIG,
   q as FluidLightPattern
 };
-//# sourceMappingURL=index.js.map
