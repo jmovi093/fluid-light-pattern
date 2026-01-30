@@ -55,15 +55,20 @@ export function useLightBlobs(
 
     // Resize canvas
     const resize = () => {
-      maskCanvas.width = window.innerWidth;
-      maskCanvas.height = window.innerHeight;
+      if (!maskCanvas) return;
+      const rect = maskCanvas.getBoundingClientRect();
+      maskCanvas.width = rect.width;
+      maskCanvas.height = rect.height;
     };
     resize();
 
     // Mouse tracking
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current.x = e.clientX;
-      mouseRef.current.y = e.clientY;
+      if (!maskCanvas) return;
+
+      const rect = maskCanvas.getBoundingClientRect();
+      mouseRef.current.x = e.clientX - rect.left;
+      mouseRef.current.y = e.clientY - rect.top;
     };
 
     // Light spot management
@@ -239,7 +244,7 @@ export function useLightBlobs(
         fps.fps = fps.frameCount;
         fps.frameCount = 0;
         fps.lastFpsTime = now;
-        
+
         if (showDebug) {
           setDebugInfo({
             spots: lightSpotsRef.current.length + 1,
@@ -254,9 +259,10 @@ export function useLightBlobs(
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
-    // Initialize mouse position
-    mouseRef.current.x = window.innerWidth / 2;
-    mouseRef.current.y = window.innerHeight / 2;
+    // Initialize mouse position OFF-SCREEN or relative to canvas
+    const rect = maskCanvas.getBoundingClientRect();
+    mouseRef.current.x = rect.width / 2;
+    mouseRef.current.y = rect.height / 2;
     mouseRef.current.prevX = mouseRef.current.x;
     mouseRef.current.prevY = mouseRef.current.y;
 
