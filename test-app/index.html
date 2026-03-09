@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test App - Fluid Light Pattern</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: system-ui;
+      background: #000;
+      color: white;
+    }
+    
+    .header {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    
+    .header-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    .section {
+      min-height: 100vh;
+      padding: 4rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .section:nth-child(odd) { background: #111; }
+    .section:nth-child(even) { background: #222; }
+    
+    .section h2 {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      color: #444cf7;
+    }
+    
+    .reload-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 15px 30px;
+      background: #444cf7;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+<script type="module" src="/app.jsx"></script>
+</body>
+</html>

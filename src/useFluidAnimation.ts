@@ -120,10 +120,10 @@ function hexToRgb(hex: string): [number, number, number] {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? [
-        parseInt(result[1], 16) / 255,
-        parseInt(result[2], 16) / 255,
-        parseInt(result[3], 16) / 255,
-      ]
+      parseInt(result[1], 16) / 255,
+      parseInt(result[2], 16) / 255,
+      parseInt(result[3], 16) / 255,
+    ]
     : [0, 0, 0];
 }
 
@@ -136,6 +136,12 @@ export function useFluidAnimation(
   const uniformsRef = useRef<FluidUniforms | null>(null);
   const startTimeRef = useRef<number>(Date.now());
   const animationFrameRef = useRef<number | null>(null);
+  const configRef = useRef<FluidLightConfig>(config);
+
+  // Keep config ref updated without re-initializing WebGL
+  useEffect(() => {
+    configRef.current = config;
+  }, [config]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -217,27 +223,28 @@ export function useFluidAnimation(
       if (!gl || !uniformsRef.current) return;
 
       const u = uniformsRef.current;
-      const bgColor = hexToRgb(config.backgroundColor);
-      const patternColor = hexToRgb(config.patternColor);
+      const cfg = configRef.current;
+      const bgColor = hexToRgb(cfg.backgroundColor);
+      const patternColor = hexToRgb(cfg.patternColor);
 
       gl.uniform2f(u.res, canvas.width, canvas.height);
       gl.uniform1f(
         u.time,
-        ((Date.now() - startTimeRef.current) / 1000) * config.animationSpeed
+        ((Date.now() - startTimeRef.current) / 1000) * cfg.animationSpeed
       );
       gl.uniform3fv(u.bg, bgColor);
       gl.uniform3fv(u.p1c, patternColor);
-      gl.uniform1f(u.p1o, config.patternOpacity);
-      gl.uniform1f(u.p1s, config.pattern1Scale);
+      gl.uniform1f(u.p1o, cfg.patternOpacity);
+      gl.uniform1f(u.p1s, cfg.pattern1Scale);
       gl.uniform3fv(u.p2c, patternColor);
-      gl.uniform1f(u.p2o, config.patternOpacity);
-      gl.uniform1f(u.p2s, config.pattern2Scale);
+      gl.uniform1f(u.p2o, cfg.patternOpacity);
+      gl.uniform1f(u.p2s, cfg.pattern2Scale);
       gl.uniform3fv(u.p3c, patternColor);
-      gl.uniform1f(u.p3o, config.patternOpacity);
-      gl.uniform1f(u.p3s, config.pattern3Scale);
+      gl.uniform1f(u.p3o, cfg.patternOpacity);
+      gl.uniform1f(u.p3s, cfg.pattern3Scale);
       gl.uniform3fv(u.p4c, patternColor);
-      gl.uniform1f(u.p4o, config.patternOpacity);
-      gl.uniform1f(u.p4s, config.pattern4Scale);
+      gl.uniform1f(u.p4o, cfg.patternOpacity);
+      gl.uniform1f(u.p4s, cfg.pattern4Scale);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
       animationFrameRef.current = requestAnimationFrame(animate);
@@ -255,7 +262,7 @@ export function useFluidAnimation(
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [canvasRef, config]);
+  }, [canvasRef]);
 
   return glRef;
 }

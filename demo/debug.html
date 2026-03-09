@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug - Fluid Light Pattern</title>
+  <style>
+    * { margin: 0; padding: 0; }
+    body { 
+      overflow: hidden; 
+      background: #000; 
+      font-family: monospace;
+    }
+    
+    #container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      border: 2px solid red; /* Para ver los bounds */
+    }
+    
+    #fluid-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      visibility: hidden;
+    }
+    
+    #mask-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    
+    #debug {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      color: lime;
+      padding: 15px;
+      font-size: 14px;
+      z-index: 1000;
+      border: 1px solid lime;
+    }
+    
+    #mouse-indicator {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      border: 2px solid yellow;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 999;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <canvas id="fluid-canvas"></canvas>
+    <canvas id="mask-canvas"></canvas>
+  </div>
+  
+  <div id="debug">
+    Mouse X: <span id="mouseX">0</span><br>
+    Mouse Y: <span id="mouseY">0</span><br>
+    Canvas X: <span id="canvasX">0</span><br>
+    Canvas Y: <span id="canvasY">0</span><br>
+    Light Spots: <span id="spots">0</span><br>
+    Main Radius: <span id="mainRadius">0</span><br>
+    Main Opacity: <span id="mainOpacity">0</span><br>
+    FPS: <span id="fps">0</span>
+  </div>
+  
+  <div id="mouse-indicator"></div>
+
+  <script>
+    // Este script simula solo la parte de light blobs
+    const container = document.getElementById('container');
+    const maskCanvas = document.getElementById('mask-canvas');
+    const ctx = maskCanvas.getContext('2d');
+    const mouseIndicator = document.getElementById('mouse-indicator');
+    
+    // Resize
+    function resize() {
+      const rect = container.getBoundingClientRect();
+      maskCanvas.width = rect.width;
+      maskCanvas.height = rect.height;
+      console.log('Canvas resized:', maskCanvas.width, maskCanvas.height);
+    }
+    resize();
+    
+    // Mouse tracking
+    let mouseX = -1000;
+    let mouseY = -1000;
+    let prevMouseX = -1000;
+    let prevMouseY = -1000;
+    let velocityX = 0;
+    let velocityY = 0;
+    
+    // Main blob
+    let currentMainRadius = 0;
+    let currentMainOpacity = 0;
+    let lastMoveTime = 0; // Tiempo 0 = muy antiguo
+    
+    // Config
+    const config = {
+      baseRadius: 190,
+      blurAmount: 30,
+      currentOpacity: 0.9,
+      closeDelay: 300,
+      mainCloseSpeed: 0.01,
+    };
+    
+    // Light spots
+    const lightSpots = [];
+    
+    // Mouse move handler
+    document.addEventListener('mousemove', (e) => {
+      const rect = maskCanvas.getBoundingClientRect();
+      
+      // Coordenadas relativas al canvas
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+      
+      // Update debug
+      document.getElementById('mouseX').textContent = e.clientX;
+      document.getElementById('mouseY').textContent = e.clientY;
+      document.getElementById('canvasX').textContent = mouseX.toFixed(0);
+      document.getElementById('canvasY').textContent = mouseY.toFixed(0);
+      
+      // Update visual indicator
+      mouseIndicator.style.left = e.clientX + 'px';
+      mouseIndicator.style.top = e.clientY + 'px';
+      
+      console.log('Mouse:', e.clientX, e.clientY, '→ Canvas:', mouseX, mouseY);
+    });
+    
+    // Draw function
+    function drawLightSpot(x, y, radius, opacity) {
+      ctx.save();
+      
+      const gradient = ctx.createRadialGradient(
+        x, y, 0,
+        x, y, radius + config.blurAmount
+      );
+      gradient.addColorStop(0, `rgba(255, 255, 255, ${opacity})`);
+      gradient.addColorStop(0.6, `rgba(255, 255, 255, ${opacity * 0.5})`);
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      
+      ctx.beginPath();
+      ctx.arc(x, y, radius + config.blurAmount, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.filter = `blur(${config.blurAmount}px)`;
+      ctx.fill();
+      
+      ctx.restore();
+      
+      // Draw red dot at center for debugging
+      ctx.fillStyle = 'red';
+      ctx.fillRect(x - 2, y - 2, 4, 4);
+    }
+    
+    // Animation loop
+    let frameCount = 0;
+    let lastFpsTime = Date.now();
+    let fps = 0;
+    
+    function animate() {
+      ctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+      
+      // Calculate movement
+      const dx = mouseX - prevMouseX;
+      const dy = mouseY - prevMouseY;
+      const hasMoved = dx !== 0 || dy !== 0;
+      
+      velocityX = velocityX * 0.8 + dx * 0.2;
+      velocityY = velocityY * 0.8 + dy * 0.2;
+      
+      // Determine if active
+      const timeSinceLastMove = Date.now() - lastMoveTime;
+      const isInDelayPeriod = timeSinceLastMove <= config.closeDelay;
+      
+      let shouldBeActive = false;
+      if (hasMoved) {
+        lastMoveTime = Date.now();
+        shouldBeActive = true;
+      } else {
+        shouldBeActive = isInDelayPeriod;
+      }
+      
+      // Animate main blob
+      if (shouldBeActive) {
+        const openSpeed = config.mainCloseSpeed * 100;
+        currentMainRadius += openSpeed;
+        if (currentMainRadius > config.baseRadius) {
+          currentMainRadius = config.baseRadius;
+        }
+        const radiusRatio = currentMainRadius / config.baseRadius;
+        currentMainOpacity = config.currentOpacity * radiusRatio;
+      } else {
+        currentMainRadius -= config.mainCloseSpeed * 100;
+        if (currentMainRadius < 0) currentMainRadius = 0;
+        const radiusRatio = currentMainRadius / config.baseRadius;
+        currentMainOpacity = config.currentOpacity * radiusRatio;
+      }
+      
+      // Draw main blob if active
+      if (currentMainRadius > 0) {
+        drawLightSpot(mouseX, mouseY, currentMainRadius, currentMainOpacity);
+      }
+      
+      // Update debug
+      document.getElementById('spots').textContent = lightSpots.length + 1;
+      document.getElementById('mainRadius').textContent = currentMainRadius.toFixed(0);
+      document.getElementById('mainOpacity').textContent = currentMainOpacity.toFixed(2);
+      
+      // FPS
+      frameCount++;
+      const now = Date.now();
+      if (now - lastFpsTime >= 1000) {
+        fps = frameCount;
+        frameCount = 0;
+        lastFpsTime = now;
+        document.getElementById('fps').textContent = fps;
+      }
+      
+      prevMouseX = mouseX;
+      prevMouseY = mouseY;
+      
+      requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    window.addEventListener('resize', resize);
+  </script>
+</body>
+</html>

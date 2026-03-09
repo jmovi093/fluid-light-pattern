@@ -35,15 +35,21 @@ export function useLightBlobs(
 ) {
   const [debugInfo, setDebugInfo] = useState({ spots: 0, fps: 0 });
   const lightSpotsRef = useRef<LightSpot[]>([]);
-  const mouseRef = useRef({ x: 0, y: 0, prevX: 0, prevY: 0 });
+  const mouseRef = useRef({ x: -1000, y: -1000, prevX: -1000, prevY: -1000 });
   const velocityRef = useRef({ x: 0, y: 0 });
   const mainBlobRef = useRef({
     currentRadius: 0,
     currentOpacity: 0,
-    lastMoveTime: Date.now(),
+    lastMoveTime: 0,
   });
   const fpsRef = useRef({ frameCount: 0, lastFpsTime: Date.now(), fps: 0 });
   const animationFrameRef = useRef<number | null>(null);
+  const configRef = useRef<FluidLightConfig>(config);
+
+  // Keep config ref updated without re-initializing animation
+  useEffect(() => {
+    configRef.current = config;
+  }, [config]);
 
   useEffect(() => {
     const maskCanvas = maskCanvasRef.current;
@@ -66,6 +72,17 @@ export function useLightBlobs(
     const handleMouseMove = (e: MouseEvent) => {
       if (!maskCanvas) return;
 
+      // Verificar si el elemento bajo el mouse tiene pointer-events: none
+      const elementUnderMouse = document.elementFromPoint(e.clientX, e.clientY);
+      if (elementUnderMouse) {
+        const computedStyle = window.getComputedStyle(elementUnderMouse);
+        if (computedStyle.pointerEvents === 'none') {
+          // Si hay un elemento con pointer-events: none, usar las coords del canvas
+          // pero NO actualizar la posición del mouse
+          return;
+        }
+      }
+
       const rect = maskCanvas.getBoundingClientRect();
       mouseRef.current.x = e.clientX - rect.left;
       mouseRef.current.y = e.clientY - rect.top;
@@ -84,7 +101,7 @@ export function useLightBlobs(
         y,
         opacity,
         baseOpacity: opacity,
-        radius: config.baseRadius,
+        radius: configRef.current.baseRadius,
         velX,
         velY,
         age: 0,
@@ -97,18 +114,19 @@ export function useLightBlobs(
     };
 
     const updateLightSpots = () => {
+      const cfg = configRef.current;
       for (let i = lightSpotsRef.current.length - 1; i >= 0; i--) {
         const spot = lightSpotsRef.current[i];
         spot.age++;
 
-        const ageFactor = Math.min(spot.age * config.fadeSpeed, 1.0);
-        spot.opacity -= config.fadeSpeed;
-        spot.radius -= config.fadeSpeed * 100 * config.trailTaper;
+        const ageFactor = Math.min(spot.age * cfg.fadeSpeed, 1.0);
+        spot.opacity -= cfg.fadeSpeed;
+        spot.radius -= cfg.fadeSpeed * 100 * cfg.trailTaper;
 
         const ageFadeMultiplier = calculateAgeFade(
           ageFactor,
-          config.ageFadeType,
-          config.ageFadeStrength
+          cfg.ageFadeType,
+          cfg.ageFadeStrength
         );
 
         const finalOpacity = spot.opacity * ageFadeMultiplier;
@@ -123,6 +141,7 @@ export function useLightBlobs(
     };
 
     const drawLightSpot = (spot: LightSpot) => {
+      const cfg = configRef.current;
       ctx.save();
 
       const opacity =
@@ -134,7 +153,7 @@ export function useLightBlobs(
         0,
         spot.x,
         spot.y,
-        spot.radius + config.blurAmount
+        spot.radius + cfg.blurAmount
       );
       gradient.addColorStop(0, `rgba(255, 255, 255, ${opacity})`);
       gradient.addColorStop(0.6, `rgba(255, 255, 255, ${opacity * 0.5})`);
@@ -144,12 +163,12 @@ export function useLightBlobs(
       ctx.arc(
         spot.x,
         spot.y,
-        spot.radius + config.blurAmount,
+        spot.radius + cfg.blurAmount,
         0,
         Math.PI * 2
       );
       ctx.fillStyle = gradient;
-      ctx.filter = `blur(${config.blurAmount}px)`;
+      ctx.filter = `blur(${cfg.blurAmount}px)`;
       ctx.fill();
 
       ctx.restore();
@@ -159,6 +178,7 @@ export function useLightBlobs(
     const animate = () => {
       ctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
 
+      const cfg = configRef.current;
       const mouse = mouseRef.current;
       const velocity = velocityRef.current;
       const mainBlob = mainBlobRef.current;
@@ -173,7 +193,7 @@ export function useLightBlobs(
 
       // Determine if blobs should be active
       const timeSinceLastMove = Date.now() - mainBlob.lastMoveTime;
-      const isInDelayPeriod = timeSinceLastMove <= config.closeDelay;
+      const isInDelayPeriod = timeSinceLastMove <= cfg.closeDelay;
 
       let shouldBeActive = false;
       if (hasMoved) {
@@ -185,26 +205,26 @@ export function useLightBlobs(
 
       // Animate main blob
       if (shouldBeActive) {
-        const openSpeed = config.mainCloseSpeed * 100;
+        const openSpeed = cfg.mainCloseSpeed * 100;
         mainBlob.currentRadius += openSpeed;
-        if (mainBlob.currentRadius > config.baseRadius) {
-          mainBlob.currentRadius = config.baseRadius;
+        if (mainBlob.currentRadius > cfg.baseRadius) {
+          mainBlob.currentRadius = cfg.baseRadius;
         }
 
-        const radiusRatio = mainBlob.currentRadius / config.baseRadius;
-        mainBlob.currentOpacity = config.currentOpacity * radiusRatio;
+        const radiusRatio = mainBlob.currentRadius / cfg.baseRadius;
+        mainBlob.currentOpacity = cfg.currentOpacity * radiusRatio;
       } else {
         mainBlob.currentRadius -=
-          config.mainCloseSpeed * 100 * config.mainCloseTaper;
+          cfg.mainCloseSpeed * 100 * cfg.mainCloseTaper;
         if (mainBlob.currentRadius < 0) mainBlob.currentRadius = 0;
 
-        const radiusRatio = mainBlob.currentRadius / config.baseRadius;
-        mainBlob.currentOpacity = config.currentOpacity * radiusRatio;
+        const radiusRatio = mainBlob.currentRadius / cfg.baseRadius;
+        mainBlob.currentOpacity = cfg.currentOpacity * radiusRatio;
       }
 
       // Create trail spots
       if (shouldBeActive && (hasMoved || isInDelayPeriod)) {
-        const trailOpacity = config.currentOpacity * config.trailMultiplier;
+        const trailOpacity = cfg.currentOpacity * cfg.trailMultiplier;
         addLightSpot(mouse.x, mouse.y, trailOpacity, velocity.x, velocity.y);
       }
 
@@ -259,13 +279,6 @@ export function useLightBlobs(
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
-    // Initialize mouse position OFF-SCREEN or relative to canvas
-    const rect = maskCanvas.getBoundingClientRect();
-    mouseRef.current.x = rect.width / 2;
-    mouseRef.current.y = rect.height / 2;
-    mouseRef.current.prevX = mouseRef.current.x;
-    mouseRef.current.prevY = mouseRef.current.y;
-
     // Start animation
     animate();
 
@@ -281,7 +294,7 @@ export function useLightBlobs(
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [maskCanvasRef, fluidCanvasRef, config, showDebug]);
+  }, [maskCanvasRef, fluidCanvasRef, showDebug]);
 
   return debugInfo;
 }
